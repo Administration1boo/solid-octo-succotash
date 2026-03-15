@@ -1,10 +1,10 @@
 --[[
-    AUTHOR: Akbarshox Hub
-    STATUS: NO BUGS / DIRECT PARENTING
+    АВТОР: Akbarshox Hub
+    СТАТУС: ОБНОВЛЕНО (Добавлен TG)
 ]]
 
 local UserInputService = game:GetService("UserInputService")
-local player = game.Players.LocalPlayer
+local локальный_игрок = game.Players.LocalPlayer
 
 -- 1. ГЛАВНОЕ ОКНО
 local screenGui = Instance.new("ScreenGui")
@@ -13,18 +13,18 @@ screenGui.Parent = game:GetService("CoreGui")
 screenGui.ResetOnSpawn = false
 
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 260, 0, 240)
-mainFrame.Position = UDim2.new(0.5, -130, 0.5, -120)
+mainFrame.Size = UDim2.new(0, 260, 0, 260) -- Немного увеличил высоту для ника
+mainFrame.Position = UDim2.new(0.5, -130, 0.5, -130)
 mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 mainFrame.BorderSizePixel = 0
 mainFrame.Active = true
-mainFrame.Draggable = true -- Включаем стандартный драг для надежности
+mainFrame.Draggable = true
 mainFrame.ClipsDescendants = true
 mainFrame.Parent = screenGui
 
-Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 15)
+Instance.new("UICorner", mainFrame).CornerRadius = UDim(0, 15)
 
--- 2. ТВОЁ ИМЯ (Заголовок)
+-- 2. ЗАГОЛОВОК (Радужный)
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 40)
 title.Text = "Akbarshox Hub"
@@ -34,7 +34,14 @@ title.TextSize = 18
 title.BackgroundTransparency = 1
 title.Parent = mainFrame
 
--- 3. КНОПКИ УПРАВЛЕНИЯ (Свернуть / Закрыть)
+spawn(function()
+    while task.wait() do
+        local hue = tick() % 5 / 5
+        title.TextColor3 = Color3.fromHSV(hue, 1, 1)
+    end
+end)
+
+-- 3. КНОПКИ УПРАВЛЕНИЯ
 local closeBtn = Instance.new("TextButton")
 closeBtn.Size = UDim2.new(0, 35, 0, 35)
 closeBtn.Position = UDim2.new(1, -40, 0, 0)
@@ -43,24 +50,13 @@ closeBtn.TextColor3 = Color3.new(1,1,1)
 closeBtn.TextSize = 25
 closeBtn.BackgroundTransparency = 1
 closeBtn.Parent = mainFrame
-
-local minBtn = Instance.new("TextButton")
-minBtn.Size = UDim2.new(0, 35, 0, 35)
-minBtn.Position = UDim2.new(1, -75, 0, 0)
-minBtn.Text = "-"
-minBtn.TextColor3 = Color3.new(1,1,1)
-minBtn.TextSize = 35
-minBtn.BackgroundTransparency = 1
-minBtn.Parent = mainFrame
-
--- Переменная для блокировки драга при использовании слайдера
-local draggingSlider = false
+closeBtn.MouseButton1Click:Connect(function() screenGui:Destroy() end)
 
 -- 4. СЛАЙДЕР СКОРОСТИ
 local sTitle = Instance.new("TextLabel")
 sTitle.Size = UDim2.new(1, 0, 0, 20)
 sTitle.Position = UDim2.new(0, 0, 0, 50)
-sTitle.Text = "Speed: 16"
+sTitle.Text = "Скорость: 16"
 sTitle.TextColor3 = Color3.new(1,1,1)
 sTitle.BackgroundTransparency = 1
 sTitle.Parent = mainFrame
@@ -82,7 +78,7 @@ Instance.new("UICorner", sFill)
 local jTitle = Instance.new("TextLabel")
 jTitle.Size = UDim2.new(1, 0, 0, 20)
 jTitle.Position = UDim2.new(0, 0, 0, 105)
-jTitle.Text = "Jump: 50"
+jTitle.Text = "Прыжок: 50"
 jTitle.TextColor3 = Color3.new(1,1,1)
 jTitle.BackgroundTransparency = 1
 jTitle.Parent = mainFrame
@@ -100,59 +96,69 @@ jFill.BackgroundColor3 = Color3.new(1,1,1)
 jFill.Parent = jBar
 Instance.new("UICorner", jFill)
 
--- 6. ТА САМАЯ КНОПКА (Infinite Jump)
+-- 6. КНОПКА БЕСКОНЕЧНЫЙ ПРЫЖОК
 local toggleBtn = Instance.new("TextButton")
-toggleBtn.Size = UDim2.new(0.8, 0, 0, 45)
-toggleBtn.Position = UDim2.new(0.1, 0, 0, 170)
+toggleBtn.Size = UDim2.new(0.8, 0, 0, 40)
+toggleBtn.Position = UDim2.new(0.1, 0, 0, 165)
 toggleBtn.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
-toggleBtn.Text = "Infinite Jump: OFF"
+toggleBtn.Text = "Бесконечный прыжок: ВЫКЛ"
 toggleBtn.TextColor3 = Color3.new(1,1,1)
 toggleBtn.Font = Enum.Font.GothamBold
 toggleBtn.Parent = mainFrame
 Instance.new("UICorner", toggleBtn)
 
+-- 7. ТВОЙ TG (ДОБАВЛЕНО)
+local tgLabel = Instance.new("TextLabel")
+tgLabel.Size = UDim2.new(1, 0, 0, 25)
+tgLabel.Position = UDim2.new(0, 0, 1, -30) -- В самом низу
+tgLabel.Text = "TG USERNAME: @UZTUBER_UZ"
+tgLabel.TextColor3 = Color3.fromRGB(150, 150, 150) -- Светло-серый
+tgLabel.TextSize = 12
+tgLabel.Font = Enum.Font.GothamItalic
+tgLabel.BackgroundTransparency = 1
+tgLabel.Parent = mainFrame
+
 --- ЛОГИКА ФУНКЦИЙ ---
 
 -- Скорость
-sBar.InputBegan:Connect(function(i)
-    if i.UserInputType == Enum.UserInputType.Touch or i.UserInputType == Enum.UserInputType.MouseButton1 then
-        draggingSlider = true
-        while draggingSlider do
-            local mPos = UserInputService:GetMouseLocation().X
-            local relPos = mPos - sBar.AbsolutePosition.X
-            local per = math.clamp(relPos / sBar.AbsoluteSize.X, 0, 1)
-            sFill.Size = UDim2.new(per, 0, 1, 0)
-            local val = math.floor(16 + (484 * per))
-            sTitle.Text = "Speed: "..val
-            if player.Character:FindFirstChild("Humanoid") then player.Character.Humanoid.WalkSpeed = val end
-            task.wait()
-        end
+sBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        local connection
+        connection = UserInputService.InputChanged:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+                local pos = math.clamp((input.Position.X - sBar.AbsolutePosition.X) / sBar.AbsoluteSize.X, 0, 1)
+                sFill.Size = UDim2.new(pos, 0, 1, 0)
+                local speed = math.floor(pos * 500)
+                sTitle.Text = "Скорость: "..speed
+                локальный_игрок.Character.Humanoid.WalkSpeed = speed
+            end
+        end)
+        UserInputService.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                connection:Disconnect()
+            end
+        end)
     end
 end)
 
 -- Прыжок
-jBar.InputBegan:Connect(function(i)
-    if i.UserInputType == Enum.UserInputType.Touch or i.UserInputType == Enum.UserInputType.MouseButton1 then
-        draggingSlider = true
-        while draggingSlider do
-            local mPos = UserInputService:GetMouseLocation().X
-            local relPos = mPos - jBar.AbsolutePosition.X
-            local per = math.clamp(relPos / jBar.AbsoluteSize.X, 0, 1)
-            jFill.Size = UDim2.new(per, 0, 1, 0)
-            local val = math.floor(50 + (450 * per))
-            jTitle.Text = "Jump: "..val
-            if player.Character:FindFirstChild("Humanoid") then 
-                player.Character.Humanoid.JumpPower = val 
-                player.Character.Humanoid.UseJumpPower = true
+jBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        local connection
+        connection = UserInputService.InputChanged:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+                local pos = math.clamp((input.Position.X - jBar.AbsolutePosition.X) / jBar.AbsoluteSize.X, 0, 1)
+                jFill.Size = UDim2.new(pos, 0, 1, 0)
+                local jump = math.floor(pos * 500)
+                jTitle.Text = "Прыжок: "..jump
+                локальный_игрок.Character.Humanoid.JumpPower = jump
             end
-            task.wait()
-        end
-    end
-end)
-
-UserInputService.InputEnded:Connect(function(i)
-    if i.UserInputType == Enum.UserInputType.Touch or i.UserInputType == Enum.UserInputType.MouseButton1 then
-        draggingSlider = false
+        end)
+        UserInputService.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                connection:Disconnect()
+            end
+        end)
     end
 end)
 
@@ -160,37 +166,12 @@ end)
 local infJump = false
 toggleBtn.MouseButton1Click:Connect(function()
     infJump = not infJump
+    toggleBtn.Text = "Бесконечный прыжок: "..(infJump and "ВКЛ" or "ВЫКЛ")
     toggleBtn.BackgroundColor3 = infJump and Color3.fromRGB(50, 180, 50) or Color3.fromRGB(180, 50, 50)
-    toggleBtn.Text = "Infinite Jump: "..(infJump and "ON" or "OFF")
 end)
 
 UserInputService.JumpRequest:Connect(function()
-    if infJump and player.Character then
-        player.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
-    end
-end)
-
--- ЛОГИКА СВЕРНУТЬ (Твой кайф)
-local isMin = false
-minBtn.MouseButton1Click:Connect(function()
-    isMin = not isMin
-    mainFrame:TweenSize(isMin and UDim2.new(0, 260, 0, 40) or UDim2.new(0, 260, 0, 240), "Out", "Quad", 0.4, true)
-    minBtn.Text = isMin and "+" or "-"
-    -- Скрываем элементы напрямую
-    sTitle.Visible = not isMin
-    sBar.Visible = not isMin
-    jTitle.Visible = not isMin
-    jBar.Visible = not isMin
-    toggleBtn.Visible = not isMin
-end)
-
-closeBtn.MouseButton1Click:Connect(function() screenGui:Destroy() end)
-
--- РАДУГА
-spawn(function()
-    local h = 0
-    while wait() do
-        h = h + 0.005
-        mainFrame.BackgroundColor3 = Color3.fromHSV(h%1, 0.6, 0.4)
+    if infJump then
+        локальный_игрок.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
     end
 end)
