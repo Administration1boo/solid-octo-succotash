@@ -1,155 +1,86 @@
 local UserInputService = game:GetService("UserInputService")
 local player = game.Players.LocalPlayer
 
--- 1. ГЛАВНОЕ ОКНО
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "Akbarshox_Direct"
-screenGui.Parent = game:GetService("CoreGui")
-screenGui.ResetOnSpawn = false
+-- СОЗДАНИЕ GUI
+local sg = Instance.new("ScreenGui", game:GetService("CoreGui"))
+sg.Name = "AkbarshoxFix"
+sg.ResetOnSpawn = false
 
-local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 260, 0, 260)
-mainFrame.Position = UDim2.new(0.5, -130, 0.5, -130)
-mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-mainFrame.BorderSizePixel = 0
-mainFrame.Active = true
-mainFrame.Draggable = true
-mainFrame.ClipsDescendants = true
-mainFrame.Parent = screenGui
+local frame = Instance.new("Frame", sg)
+frame.Size = UDim2.new(0, 250, 0, 280)
+frame.Position = UDim2.new(0.5, -125, 0.5, -140)
+frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+frame.Active = true
+frame.Draggable = true
 
-Instance.new("UICorner", mainFrame).CornerRadius = UDim(0, 15)
+local corner = Instance.new("UICorner", frame)
+corner.CornerRadius = UDim(0, 12)
 
--- 2. ЗАГОЛОВОК
-local title = Instance.new("TextLabel")
+-- ЗАГОЛОВОК
+local title = Instance.new("TextLabel", frame)
 title.Size = UDim2.new(1, 0, 0, 40)
 title.Text = "Akbarshox Hub"
 title.TextColor3 = Color3.new(1, 1, 1)
 title.Font = Enum.Font.GothamBold
-title.TextSize = 18
+title.TextSize = 20
 title.BackgroundTransparency = 1
-title.Parent = mainFrame
 
+-- РАДУГА
 task.spawn(function()
     while task.wait() do
-        local hue = tick() % 5 / 5
-        title.TextColor3 = Color3.fromHSV(hue, 1, 1)
+        title.TextColor3 = Color3.fromHSV(tick() % 5 / 5, 1, 1)
     end
 end)
 
--- 3. КНОПКА ЗАКРЫТИЯ
-local closeBtn = Instance.new("TextButton")
-closeBtn.Size = UDim2.new(0, 35, 0, 35)
-closeBtn.Position = UDim2.new(1, -40, 0, 0)
-closeBtn.Text = "×"
-closeBtn.TextColor3 = Color3.new(1, 1, 1)
-closeBtn.TextSize = 25
-closeBtn.BackgroundTransparency = 1
-closeBtn.Parent = mainFrame
-closeBtn.MouseButton1Click:Connect(function() screenGui:Destroy() end)
-
--- 4. СЛАЙДЕР СКОРОСТИ
-local sTitle = Instance.new("TextLabel")
-sTitle.Size = UDim2.new(1, 0, 0, 20)
-sTitle.Position = UDim2.new(0, 0, 0, 50)
-sTitle.Text = "Скорость: 16"
-sTitle.TextColor3 = Color3.new(1, 1, 1)
-sTitle.BackgroundTransparency = 1
-sTitle.Parent = mainFrame
-
-local sBar = Instance.new("Frame")
-sBar.Size = UDim2.new(0.8, 0, 0, 15)
-sBar.Position = UDim2.new(0.1, 0, 0, 75)
-sBar.BackgroundColor3 = Color3.new(0, 0, 0)
-sBar.Parent = mainFrame
-Instance.new("UICorner", sBar)
-
-local sFill = Instance.new("Frame")
-sFill.Size = UDim2.new(0, 0, 1, 0)
-sFill.BackgroundColor3 = Color3.new(1, 1, 1)
-sFill.Parent = sBar
-Instance.new("UICorner", sFill)
-
--- 5. СЛАЙДЕР ПРЫЖКА
-local jTitle = Instance.new("TextLabel")
-jTitle.Size = UDim2.new(1, 0, 0, 20)
-jTitle.Position = UDim2.new(0, 0, 0, 105)
-jTitle.Text = "Прыжок: 50"
-jTitle.TextColor3 = Color3.new(1, 1, 1)
-jTitle.BackgroundTransparency = 1
-jTitle.Parent = mainFrame
-
-local jBar = Instance.new("Frame")
-jBar.Size = UDim2.new(0.8, 0, 0, 15)
-jBar.Position = UDim2.new(0.1, 0, 0, 130)
-jBar.BackgroundColor3 = Color3.new(0, 0, 0)
-jBar.Parent = mainFrame
-Instance.new("UICorner", jBar)
-
-local jFill = Instance.new("Frame")
-jFill.Size = UDim2.new(0, 0, 1, 0)
-jFill.BackgroundColor3 = Color3.new(1, 1, 1)
-jFill.Parent = jBar
-Instance.new("UICorner", jFill)
-
--- 6. КНОПКА БЕСКОНЕЧНЫЙ ПРЫЖОК
-local toggleBtn = Instance.new("TextButton")
-toggleBtn.Size = UDim2.new(0.8, 0, 0, 40)
-toggleBtn.Position = UDim2.new(0.1, 0, 0, 165)
-toggleBtn.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
-toggleBtn.Text = "Бесконечный прыжок: ВЫКЛ"
-toggleBtn.TextColor3 = Color3.new(1, 1, 1)
-toggleBtn.Font = Enum.Font.GothamBold
-toggleBtn.Parent = mainFrame
-Instance.new("UICorner", toggleBtn)
-
--- 7. TG ПОДПИСЬ
-local tgLabel = Instance.new("TextLabel")
-tgLabel.Size = UDim2.new(1, 0, 0, 25)
-tgLabel.Position = UDim2.new(0, 0, 1, -30)
-tgLabel.Text = "TG USERNAME: @UZTUBER_UZ"
-tgLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
-tgLabel.TextSize = 12
-tgLabel.Font = Enum.Font.GothamItalic
-tgLabel.BackgroundTransparency = 1
-tgLabel.Parent = mainFrame
-
--- ЛОГИКА
-local function createSlider(bar, fill, title, prefix, maxVal, property)
-    bar.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            local connection
-            connection = UserInputService.InputChanged:Connect(function(move)
-                if move.UserInputType == Enum.UserInputType.MouseMovement or move.UserInputType == Enum.UserInputType.Touch then
-                    local pos = math.clamp((move.Position.X - bar.AbsolutePosition.X) / bar.AbsoluteSize.X, 0, 1)
-                    fill.Size = UDim2.new(pos, 0, 1, 0)
-                    local val = math.floor(pos * maxVal)
-                    title.Text = prefix..": "..val
-                    if player.Character and player.Character:FindFirstChild("Humanoid") then
-                        player.Character.Humanoid[property] = val
-                    end
-                end
-            end)
-            UserInputService.InputEnded:Connect(function(ended)
-                if ended.UserInputType == Enum.UserInputType.MouseButton1 or ended.UserInputType == Enum.UserInputType.Touch then
-                    connection:Disconnect()
-                end
-            end)
-        end
-    end)
+-- ФУНКЦИЯ ДЛЯ КНОПОК
+local function createBtn(text, pos, color, callback)
+    local btn = Instance.new("TextButton", frame)
+    btn.Size = UDim2.new(0.8, 0, 0, 40)
+    btn.Position = UDim2.new(0.1, 0, 0, pos)
+    btn.BackgroundColor3 = color
+    btn.Text = text
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 14
+    Instance.new("UICorner", btn)
+    btn.MouseButton1Click:Connect(callback)
+    return btn
 end
 
-createSlider(sBar, sFill, sTitle, "Скорость", 500, "WalkSpeed")
-createSlider(jBar, jFill, jTitle, "Прыжок", 500, "JumpPower")
+-- КНОПКИ
+createBtn("Speed 100", 60, Color3.fromRGB(60, 60, 60), function()
+    player.Character.Humanoid.WalkSpeed = 100
+end)
+
+createBtn("Jump 150", 110, Color3.fromRGB(60, 60, 60), function()
+    player.Character.Humanoid.JumpPower = 150
+end)
 
 local infJump = false
-toggleBtn.MouseButton1Click:Connect(function()
+local jBtn = createBtn("Inf Jump: OFF", 160, Color3.fromRGB(180, 50, 50), function()
     infJump = not infJump
-    toggleBtn.Text = "Бесконечный прыжок: "..(infJump and "ВКЛ" or "ВЫКЛ")
-    toggleBtn.BackgroundColor3 = infJump and Color3.fromRGB(50, 180, 50) or Color3.fromRGB(180, 50, 50)
+    _G.btnText = infJump and "Inf Jump: ON" or "Inf Jump: OFF"
 end)
 
+-- TG ТЕКСТ
+local tg = Instance.new("TextLabel", frame)
+tg.Size = UDim2.new(1, 0, 0, 30)
+tg.Position = UDim2.new(0, 0, 1, -35)
+tg.Text = "TG: @UZTUBER_UZ"
+tg.TextColor3 = Color3.fromRGB(150, 150, 150)
+tg.BackgroundTransparency = 1
+tg.TextSize = 12
+
+-- ЛОГИКА ПРЫЖКА
 UserInputService.JumpRequest:Connect(function()
-    if infJump and player.Character and player.Character:FindFirstChildOfClass("Humanoid") then
-        player.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
-    end
+    if infJump then player.Character.Humanoid:ChangeState("Jumping") end
 end)
+
+-- ЗАКРЫТИЕ
+local close = Instance.new("TextButton", frame)
+close.Size = UDim2.new(0, 30, 0, 30)
+close.Position = UDim2.new(1, -35, 0, 5)
+close.Text = "X"
+close.TextColor3 = Color3.new(1,0,0)
+close.BackgroundTransparency = 1
+close.MouseButton1Click:Connect(function() sg:Destroy() end)
