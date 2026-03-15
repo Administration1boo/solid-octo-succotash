@@ -1,10 +1,5 @@
---[[
-    АВТОР: Akbarshox Hub
-    СТАТУС: ОБНОВЛЕНО (Добавлен TG)
-]]
-
 local UserInputService = game:GetService("UserInputService")
-local локальный_игрок = game.Players.LocalPlayer
+local player = game.Players.LocalPlayer
 
 -- 1. ГЛАВНОЕ ОКНО
 local screenGui = Instance.new("ScreenGui")
@@ -13,7 +8,7 @@ screenGui.Parent = game:GetService("CoreGui")
 screenGui.ResetOnSpawn = false
 
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 260, 0, 260) -- Немного увеличил высоту для ника
+mainFrame.Size = UDim2.new(0, 260, 0, 260)
 mainFrame.Position = UDim2.new(0.5, -130, 0.5, -130)
 mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 mainFrame.BorderSizePixel = 0
@@ -24,29 +19,29 @@ mainFrame.Parent = screenGui
 
 Instance.new("UICorner", mainFrame).CornerRadius = UDim(0, 15)
 
--- 2. ЗАГОЛОВОК (Радужный)
+-- 2. ЗАГОЛОВОК
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 40)
 title.Text = "Akbarshox Hub"
-title.TextColor3 = Color3.new(1,1,1)
+title.TextColor3 = Color3.new(1, 1, 1)
 title.Font = Enum.Font.GothamBold
 title.TextSize = 18
 title.BackgroundTransparency = 1
 title.Parent = mainFrame
 
-spawn(function()
+task.spawn(function()
     while task.wait() do
         local hue = tick() % 5 / 5
         title.TextColor3 = Color3.fromHSV(hue, 1, 1)
     end
 end)
 
--- 3. КНОПКИ УПРАВЛЕНИЯ
+-- 3. КНОПКА ЗАКРЫТИЯ
 local closeBtn = Instance.new("TextButton")
 closeBtn.Size = UDim2.new(0, 35, 0, 35)
 closeBtn.Position = UDim2.new(1, -40, 0, 0)
 closeBtn.Text = "×"
-closeBtn.TextColor3 = Color3.new(1,1,1)
+closeBtn.TextColor3 = Color3.new(1, 1, 1)
 closeBtn.TextSize = 25
 closeBtn.BackgroundTransparency = 1
 closeBtn.Parent = mainFrame
@@ -57,20 +52,20 @@ local sTitle = Instance.new("TextLabel")
 sTitle.Size = UDim2.new(1, 0, 0, 20)
 sTitle.Position = UDim2.new(0, 0, 0, 50)
 sTitle.Text = "Скорость: 16"
-sTitle.TextColor3 = Color3.new(1,1,1)
+sTitle.TextColor3 = Color3.new(1, 1, 1)
 sTitle.BackgroundTransparency = 1
 sTitle.Parent = mainFrame
 
 local sBar = Instance.new("Frame")
 sBar.Size = UDim2.new(0.8, 0, 0, 15)
 sBar.Position = UDim2.new(0.1, 0, 0, 75)
-sBar.BackgroundColor3 = Color3.new(0,0,0)
+sBar.BackgroundColor3 = Color3.new(0, 0, 0)
 sBar.Parent = mainFrame
 Instance.new("UICorner", sBar)
 
 local sFill = Instance.new("Frame")
 sFill.Size = UDim2.new(0, 0, 1, 0)
-sFill.BackgroundColor3 = Color3.new(1,1,1)
+sFill.BackgroundColor3 = Color3.new(1, 1, 1)
 sFill.Parent = sBar
 Instance.new("UICorner", sFill)
 
@@ -79,20 +74,20 @@ local jTitle = Instance.new("TextLabel")
 jTitle.Size = UDim2.new(1, 0, 0, 20)
 jTitle.Position = UDim2.new(0, 0, 0, 105)
 jTitle.Text = "Прыжок: 50"
-jTitle.TextColor3 = Color3.new(1,1,1)
+jTitle.TextColor3 = Color3.new(1, 1, 1)
 jTitle.BackgroundTransparency = 1
 jTitle.Parent = mainFrame
 
 local jBar = Instance.new("Frame")
 jBar.Size = UDim2.new(0.8, 0, 0, 15)
 jBar.Position = UDim2.new(0.1, 0, 0, 130)
-jBar.BackgroundColor3 = Color3.new(0,0,0)
+jBar.BackgroundColor3 = Color3.new(0, 0, 0)
 jBar.Parent = mainFrame
 Instance.new("UICorner", jBar)
 
 local jFill = Instance.new("Frame")
 jFill.Size = UDim2.new(0, 0, 1, 0)
-jFill.BackgroundColor3 = Color3.new(1,1,1)
+jFill.BackgroundColor3 = Color3.new(1, 1, 1)
 jFill.Parent = jBar
 Instance.new("UICorner", jFill)
 
@@ -102,67 +97,50 @@ toggleBtn.Size = UDim2.new(0.8, 0, 0, 40)
 toggleBtn.Position = UDim2.new(0.1, 0, 0, 165)
 toggleBtn.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
 toggleBtn.Text = "Бесконечный прыжок: ВЫКЛ"
-toggleBtn.TextColor3 = Color3.new(1,1,1)
+toggleBtn.TextColor3 = Color3.new(1, 1, 1)
 toggleBtn.Font = Enum.Font.GothamBold
 toggleBtn.Parent = mainFrame
 Instance.new("UICorner", toggleBtn)
 
--- 7. ТВОЙ TG (ДОБАВЛЕНО)
+-- 7. TG ПОДПИСЬ
 local tgLabel = Instance.new("TextLabel")
 tgLabel.Size = UDim2.new(1, 0, 0, 25)
-tgLabel.Position = UDim2.new(0, 0, 1, -30) -- В самом низу
+tgLabel.Position = UDim2.new(0, 0, 1, -30)
 tgLabel.Text = "TG USERNAME: @UZTUBER_UZ"
-tgLabel.TextColor3 = Color3.fromRGB(150, 150, 150) -- Светло-серый
+tgLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
 tgLabel.TextSize = 12
 tgLabel.Font = Enum.Font.GothamItalic
 tgLabel.BackgroundTransparency = 1
 tgLabel.Parent = mainFrame
 
---- ЛОГИКА ФУНКЦИЙ ---
+-- ЛОГИКА
+local function createSlider(bar, fill, title, prefix, maxVal, property)
+    bar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            local connection
+            connection = UserInputService.InputChanged:Connect(function(move)
+                if move.UserInputType == Enum.UserInputType.MouseMovement or move.UserInputType == Enum.UserInputType.Touch then
+                    local pos = math.clamp((move.Position.X - bar.AbsolutePosition.X) / bar.AbsoluteSize.X, 0, 1)
+                    fill.Size = UDim2.new(pos, 0, 1, 0)
+                    local val = math.floor(pos * maxVal)
+                    title.Text = prefix..": "..val
+                    if player.Character and player.Character:FindFirstChild("Humanoid") then
+                        player.Character.Humanoid[property] = val
+                    end
+                end
+            end)
+            UserInputService.InputEnded:Connect(function(ended)
+                if ended.UserInputType == Enum.UserInputType.MouseButton1 or ended.UserInputType == Enum.UserInputType.Touch then
+                    connection:Disconnect()
+                end
+            end)
+        end
+    end)
+end
 
--- Скорость
-sBar.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        local connection
-        connection = UserInputService.InputChanged:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-                local pos = math.clamp((input.Position.X - sBar.AbsolutePosition.X) / sBar.AbsoluteSize.X, 0, 1)
-                sFill.Size = UDim2.new(pos, 0, 1, 0)
-                local speed = math.floor(pos * 500)
-                sTitle.Text = "Скорость: "..speed
-                локальный_игрок.Character.Humanoid.WalkSpeed = speed
-            end
-        end)
-        UserInputService.InputEnded:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                connection:Disconnect()
-            end
-        end)
-    end
-end)
+createSlider(sBar, sFill, sTitle, "Скорость", 500, "WalkSpeed")
+createSlider(jBar, jFill, jTitle, "Прыжок", 500, "JumpPower")
 
--- Прыжок
-jBar.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        local connection
-        connection = UserInputService.InputChanged:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-                local pos = math.clamp((input.Position.X - jBar.AbsolutePosition.X) / jBar.AbsoluteSize.X, 0, 1)
-                jFill.Size = UDim2.new(pos, 0, 1, 0)
-                local jump = math.floor(pos * 500)
-                jTitle.Text = "Прыжок: "..jump
-                локальный_игрок.Character.Humanoid.JumpPower = jump
-            end
-        end)
-        UserInputService.InputEnded:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                connection:Disconnect()
-            end
-        end)
-    end
-end)
-
--- Бесконечный прыжок
 local infJump = false
 toggleBtn.MouseButton1Click:Connect(function()
     infJump = not infJump
@@ -171,7 +149,7 @@ toggleBtn.MouseButton1Click:Connect(function()
 end)
 
 UserInputService.JumpRequest:Connect(function()
-    if infJump then
-        локальный_игрок.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+    if infJump and player.Character and player.Character:FindFirstChildOfClass("Humanoid") then
+        player.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
     end
 end)
