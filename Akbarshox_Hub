@@ -1,0 +1,196 @@
+--[[
+    AUTHOR: Akbarshox Hub
+    STATUS: NO BUGS / DIRECT PARENTING
+]]
+
+local UserInputService = game:GetService("UserInputService")
+local player = game.Players.LocalPlayer
+
+-- 1. ГЛАВНОЕ ОКНО
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "Akbarshox_Direct"
+screenGui.Parent = game:GetService("CoreGui")
+screenGui.ResetOnSpawn = false
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 260, 0, 240)
+mainFrame.Position = UDim2.new(0.5, -130, 0.5, -120)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true -- Включаем стандартный драг для надежности
+mainFrame.ClipsDescendants = true
+mainFrame.Parent = screenGui
+
+Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 15)
+
+-- 2. ТВОЁ ИМЯ (Заголовок)
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 40)
+title.Text = "Akbarshox Hub"
+title.TextColor3 = Color3.new(1,1,1)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+title.BackgroundTransparency = 1
+title.Parent = mainFrame
+
+-- 3. КНОПКИ УПРАВЛЕНИЯ (Свернуть / Закрыть)
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, 35, 0, 35)
+closeBtn.Position = UDim2.new(1, -40, 0, 0)
+closeBtn.Text = "×"
+closeBtn.TextColor3 = Color3.new(1,1,1)
+closeBtn.TextSize = 25
+closeBtn.BackgroundTransparency = 1
+closeBtn.Parent = mainFrame
+
+local minBtn = Instance.new("TextButton")
+minBtn.Size = UDim2.new(0, 35, 0, 35)
+minBtn.Position = UDim2.new(1, -75, 0, 0)
+minBtn.Text = "-"
+minBtn.TextColor3 = Color3.new(1,1,1)
+minBtn.TextSize = 35
+minBtn.BackgroundTransparency = 1
+minBtn.Parent = mainFrame
+
+-- Переменная для блокировки драга при использовании слайдера
+local draggingSlider = false
+
+-- 4. СЛАЙДЕР СКОРОСТИ
+local sTitle = Instance.new("TextLabel")
+sTitle.Size = UDim2.new(1, 0, 0, 20)
+sTitle.Position = UDim2.new(0, 0, 0, 50)
+sTitle.Text = "Speed: 16"
+sTitle.TextColor3 = Color3.new(1,1,1)
+sTitle.BackgroundTransparency = 1
+sTitle.Parent = mainFrame
+
+local sBar = Instance.new("Frame")
+sBar.Size = UDim2.new(0.8, 0, 0, 15)
+sBar.Position = UDim2.new(0.1, 0, 0, 75)
+sBar.BackgroundColor3 = Color3.new(0,0,0)
+sBar.Parent = mainFrame
+Instance.new("UICorner", sBar)
+
+local sFill = Instance.new("Frame")
+sFill.Size = UDim2.new(0, 0, 1, 0)
+sFill.BackgroundColor3 = Color3.new(1,1,1)
+sFill.Parent = sBar
+Instance.new("UICorner", sFill)
+
+-- 5. СЛАЙДЕР ПРЫЖКА
+local jTitle = Instance.new("TextLabel")
+jTitle.Size = UDim2.new(1, 0, 0, 20)
+jTitle.Position = UDim2.new(0, 0, 0, 105)
+jTitle.Text = "Jump: 50"
+jTitle.TextColor3 = Color3.new(1,1,1)
+jTitle.BackgroundTransparency = 1
+jTitle.Parent = mainFrame
+
+local jBar = Instance.new("Frame")
+jBar.Size = UDim2.new(0.8, 0, 0, 15)
+jBar.Position = UDim2.new(0.1, 0, 0, 130)
+jBar.BackgroundColor3 = Color3.new(0,0,0)
+jBar.Parent = mainFrame
+Instance.new("UICorner", jBar)
+
+local jFill = Instance.new("Frame")
+jFill.Size = UDim2.new(0, 0, 1, 0)
+jFill.BackgroundColor3 = Color3.new(1,1,1)
+jFill.Parent = jBar
+Instance.new("UICorner", jFill)
+
+-- 6. ТА САМАЯ КНОПКА (Infinite Jump)
+local toggleBtn = Instance.new("TextButton")
+toggleBtn.Size = UDim2.new(0.8, 0, 0, 45)
+toggleBtn.Position = UDim2.new(0.1, 0, 0, 170)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
+toggleBtn.Text = "Infinite Jump: OFF"
+toggleBtn.TextColor3 = Color3.new(1,1,1)
+toggleBtn.Font = Enum.Font.GothamBold
+toggleBtn.Parent = mainFrame
+Instance.new("UICorner", toggleBtn)
+
+--- ЛОГИКА ФУНКЦИЙ ---
+
+-- Скорость
+sBar.InputBegan:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.Touch or i.UserInputType == Enum.UserInputType.MouseButton1 then
+        draggingSlider = true
+        while draggingSlider do
+            local mPos = UserInputService:GetMouseLocation().X
+            local relPos = mPos - sBar.AbsolutePosition.X
+            local per = math.clamp(relPos / sBar.AbsoluteSize.X, 0, 1)
+            sFill.Size = UDim2.new(per, 0, 1, 0)
+            local val = math.floor(16 + (484 * per))
+            sTitle.Text = "Speed: "..val
+            if player.Character:FindFirstChild("Humanoid") then player.Character.Humanoid.WalkSpeed = val end
+            task.wait()
+        end
+    end
+end)
+
+-- Прыжок
+jBar.InputBegan:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.Touch or i.UserInputType == Enum.UserInputType.MouseButton1 then
+        draggingSlider = true
+        while draggingSlider do
+            local mPos = UserInputService:GetMouseLocation().X
+            local relPos = mPos - jBar.AbsolutePosition.X
+            local per = math.clamp(relPos / jBar.AbsoluteSize.X, 0, 1)
+            jFill.Size = UDim2.new(per, 0, 1, 0)
+            local val = math.floor(50 + (450 * per))
+            jTitle.Text = "Jump: "..val
+            if player.Character:FindFirstChild("Humanoid") then 
+                player.Character.Humanoid.JumpPower = val 
+                player.Character.Humanoid.UseJumpPower = true
+            end
+            task.wait()
+        end
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.Touch or i.UserInputType == Enum.UserInputType.MouseButton1 then
+        draggingSlider = false
+    end
+end)
+
+-- Бесконечный прыжок
+local infJump = false
+toggleBtn.MouseButton1Click:Connect(function()
+    infJump = not infJump
+    toggleBtn.BackgroundColor3 = infJump and Color3.fromRGB(50, 180, 50) or Color3.fromRGB(180, 50, 50)
+    toggleBtn.Text = "Infinite Jump: "..(infJump and "ON" or "OFF")
+end)
+
+UserInputService.JumpRequest:Connect(function()
+    if infJump and player.Character then
+        player.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+    end
+end)
+
+-- ЛОГИКА СВЕРНУТЬ (Твой кайф)
+local isMin = false
+minBtn.MouseButton1Click:Connect(function()
+    isMin = not isMin
+    mainFrame:TweenSize(isMin and UDim2.new(0, 260, 0, 40) or UDim2.new(0, 260, 0, 240), "Out", "Quad", 0.4, true)
+    minBtn.Text = isMin and "+" or "-"
+    -- Скрываем элементы напрямую
+    sTitle.Visible = not isMin
+    sBar.Visible = not isMin
+    jTitle.Visible = not isMin
+    jBar.Visible = not isMin
+    toggleBtn.Visible = not isMin
+end)
+
+closeBtn.MouseButton1Click:Connect(function() screenGui:Destroy() end)
+
+-- РАДУГА
+spawn(function()
+    local h = 0
+    while wait() do
+        h = h + 0.005
+        mainFrame.BackgroundColor3 = Color3.fromHSV(h%1, 0.6, 0.4)
+    end
+end)
