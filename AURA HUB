@@ -1,0 +1,401 @@
+local Players=game:GetService("Players")
+local UIS=game:GetService("UserInputService")
+local RS=game:GetService("RunService")
+local TS=game:GetService("TweenService")
+
+local LP=Players.LocalPlayer
+
+local speedOn=false
+local jumpOn=false
+local infJump=false
+local noclip=false
+local espOn=false
+
+local speedValue=16
+local jumpValue=50
+
+-- GUI
+
+local gui=Instance.new("ScreenGui")
+gui.Parent=game.CoreGui
+gui.ResetOnSpawn=false
+
+local main=Instance.new("Frame",gui)
+main.Size=UDim2.new(0,340,0,300)
+main.Position=UDim2.new(.4,0,.3,0)
+main.BackgroundColor3=Color3.fromRGB(25,0,40)
+main.Active=true
+
+-- TOP
+
+local top=Instance.new("Frame",main)
+top.Size=UDim2.new(1,0,0,30)
+top.BackgroundColor3=Color3.fromRGB(60,0,90)
+
+local title=Instance.new("TextLabel",top)
+title.Size=UDim2.new(1,-60,1,0)
+title.Position=UDim2.new(0,10,0,0)
+title.BackgroundTransparency=1
+title.Text="AURA HUB"
+title.TextColor3=Color3.fromRGB(220,0,255)
+title.TextScaled=true
+title.TextXAlignment=Enum.TextXAlignment.Left
+
+-- CLOSE
+
+local close=Instance.new("TextButton",top)
+close.Size=UDim2.new(0,30,1,0)
+close.Position=UDim2.new(1,-30,0,0)
+close.Text="×"
+close.TextScaled=true
+close.BackgroundTransparency=1
+close.TextColor3=Color3.fromRGB(220,0,255)
+
+close.MouseButton1Click:Connect(function()
+gui:Destroy()
+end)
+
+-- MINIMIZE
+
+local minimized=false
+
+local content=Instance.new("Frame",main)
+content.Size=UDim2.new(1,0,1,-30)
+content.Position=UDim2.new(0,0,0,30)
+content.BackgroundTransparency=1
+
+local min=Instance.new("TextButton",top)
+min.Size=UDim2.new(0,30,1,0)
+min.Position=UDim2.new(1,-60,0,0)
+min.Text="-"
+min.TextScaled=true
+min.BackgroundTransparency=1
+min.TextColor3=Color3.fromRGB(220,0,255)
+
+min.MouseButton1Click:Connect(function()
+
+minimized=not minimized
+
+if minimized then
+TS:Create(main,TweenInfo.new(.25),{Size=UDim2.new(0,340,0,30)}):Play()
+content.Visible=false
+else
+TS:Create(main,TweenInfo.new(.25),{Size=UDim2.new(0,340,0,300)}):Play()
+task.wait(.2)
+content.Visible=true
+end
+
+end)
+
+-- DRAG
+
+local dragging=false
+local dragStart
+local startPos
+
+top.InputBegan:Connect(function(input)
+
+if input.UserInputType==Enum.UserInputType.MouseButton1
+or input.UserInputType==Enum.UserInputType.Touch then
+
+dragging=true
+dragStart=input.Position
+startPos=main.Position
+
+end
+
+end)
+
+UIS.InputChanged:Connect(function(input)
+
+if dragging and (input.UserInputType==Enum.UserInputType.MouseMovement
+or input.UserInputType==Enum.UserInputType.Touch) then
+
+local delta=input.Position-dragStart
+
+main.Position=UDim2.new(
+startPos.X.Scale,
+startPos.X.Offset+delta.X,
+startPos.Y.Scale,
+startPos.Y.Offset+delta.Y
+)
+
+end
+
+end)
+
+UIS.InputEnded:Connect(function(input)
+
+if input.UserInputType==Enum.UserInputType.MouseButton1
+or input.UserInputType==Enum.UserInputType.Touch then
+dragging=false
+end
+
+end)
+
+-- TABS
+
+local tabs=Instance.new("Frame",content)
+tabs.Size=UDim2.new(1,0,0,30)
+tabs.BackgroundTransparency=1
+
+local function tab(name,pos)
+
+local b=Instance.new("TextButton",tabs)
+b.Size=UDim2.new(.33,0,1,0)
+b.Position=UDim2.new(pos,0,0,0)
+b.Text=name
+b.TextScaled=true
+b.BackgroundTransparency=1
+b.TextColor3=Color3.fromRGB(220,0,255)
+
+return b
+
+end
+
+local othersTab=tab("Others",0)
+local slidersTab=tab("Sliders",.33)
+local infoTab=tab("Info",.66)
+
+-- PAGES
+
+local function page()
+
+local p=Instance.new("Frame",content)
+p.Size=UDim2.new(1,0,1,-30)
+p.Position=UDim2.new(0,0,0,30)
+p.BackgroundTransparency=1
+p.Visible=false
+
+return p
+
+end
+
+local others=page()
+local sliders=page()
+local info=page()
+
+others.Visible=true
+
+local function show(p)
+
+others.Visible=false
+sliders.Visible=false
+info.Visible=false
+
+p.Visible=true
+
+end
+
+othersTab.MouseButton1Click:Connect(function()show(others)end)
+slidersTab.MouseButton1Click:Connect(function()show(sliders)end)
+infoTab.MouseButton1Click:Connect(function()show(info)end)
+
+-- BUTTONS
+
+local function button(name,y)
+
+local b=Instance.new("TextButton",others)
+b.Size=UDim2.new(.8,0,0,30)
+b.Position=UDim2.new(.1,0,0,y)
+b.BackgroundColor3=Color3.fromRGB(50,0,80)
+b.TextColor3=Color3.fromRGB(220,0,255)
+b.Text=name.." OFF"
+b.TextScaled=true
+
+return b
+
+end
+
+local speedBtn=button("Speed",10)
+local jumpBtn=button("Jump",50)
+local infBtn=button("∞ Jump",90)
+local noclipBtn=button("Noclip",130)
+local espBtn=button("ESP",170)
+
+speedBtn.MouseButton1Click:Connect(function()
+speedOn=not speedOn
+speedBtn.Text="Speed "..(speedOn and "ON" or "OFF")
+end)
+
+jumpBtn.MouseButton1Click:Connect(function()
+jumpOn=not jumpOn
+jumpBtn.Text="Jump "..(jumpOn and "ON" or "OFF")
+end)
+
+infBtn.MouseButton1Click:Connect(function()
+infJump=not infJump
+infBtn.Text="∞ Jump "..(infJump and "ON" or "OFF")
+end)
+
+noclipBtn.MouseButton1Click:Connect(function()
+noclip=not noclip
+noclipBtn.Text="Noclip "..(noclip and "ON" or "OFF")
+end)
+
+-- ESP
+
+espBtn.MouseButton1Click:Connect(function()
+
+espOn=not espOn
+espBtn.Text="ESP "..(espOn and "ON" or "OFF")
+
+for _,p in pairs(Players:GetPlayers()) do
+
+if p~=LP and p.Character then
+
+if espOn then
+
+local h=Instance.new("Highlight")
+h.FillColor=Color3.fromRGB(200,0,255)
+h.OutlineColor=Color3.fromRGB(255,0,255)
+h.Parent=p.Character
+
+else
+
+for _,v in pairs(p.Character:GetChildren()) do
+if v:IsA("Highlight") then
+v:Destroy()
+end
+end
+
+end
+
+end
+
+end
+
+end)
+
+-- SLIDERS (FIXED)
+
+local function slider(name,min,max,y)
+
+local dragging=false
+
+local label=Instance.new("TextLabel",sliders)
+label.Size=UDim2.new(.8,0,0,20)
+label.Position=UDim2.new(.1,0,0,y)
+label.BackgroundTransparency=1
+label.Text=name..": "..min
+label.TextScaled=true
+label.TextColor3=Color3.fromRGB(220,0,255)
+
+local bar=Instance.new("Frame",sliders)
+bar.Size=UDim2.new(.8,0,0,10)
+bar.Position=UDim2.new(.1,0,0,y+22)
+bar.BackgroundColor3=Color3.fromRGB(80,0,120)
+
+local fill=Instance.new("Frame",bar)
+fill.Size=UDim2.new(0,0,1,0)
+fill.BackgroundColor3=Color3.fromRGB(220,0,255)
+
+local function update(x)
+
+local pos=(x-bar.AbsolutePosition.X)/bar.AbsoluteSize.X
+pos=math.clamp(pos,0,1)
+
+fill.Size=UDim2.new(pos,0,1,0)
+
+local value=math.floor((max-min)*pos+min)
+
+label.Text=name..": "..value
+
+if name=="Speed" then
+speedValue=value
+end
+
+if name=="Jump" then
+jumpValue=value
+end
+
+end
+
+bar.InputBegan:Connect(function(input)
+
+if input.UserInputType==Enum.UserInputType.MouseButton1
+or input.UserInputType==Enum.UserInputType.Touch then
+
+dragging=true
+update(input.Position.X)
+
+end
+
+end)
+
+UIS.InputChanged:Connect(function(input)
+
+if dragging and (
+input.UserInputType==Enum.UserInputType.MouseMovement
+or input.UserInputType==Enum.UserInputType.Touch) then
+
+update(input.Position.X)
+
+end
+
+end)
+
+UIS.InputEnded:Connect(function(input)
+
+if input.UserInputType==Enum.UserInputType.MouseButton1
+or input.UserInputType==Enum.UserInputType.Touch then
+dragging=false
+end
+
+end)
+
+end
+
+slider("Speed",16,200,20)
+slider("Jump",50,200,80)
+
+-- INFO
+
+local tg=Instance.new("TextLabel",info)
+tg.Size=UDim2.new(1,0,0,40)
+tg.Position=UDim2.new(0,0,0,40)
+tg.BackgroundTransparency=1
+tg.Text="Support TG: @UZTUBER_UZ"
+tg.TextScaled=true
+tg.TextColor3=Color3.fromRGB(220,0,255)
+
+local yt=Instance.new("TextLabel",info)
+yt.Size=UDim2.new(1,0,0,40)
+yt.Position=UDim2.new(0,0,0,90)
+yt.BackgroundTransparency=1
+yt.Text="YT: UZTUBER"
+yt.TextScaled=true
+yt.TextColor3=Color3.fromRGB(220,0,255)
+
+-- LOOP
+
+RS.RenderStepped:Connect(function()
+
+local char=LP.Character
+if not char then return end
+
+local hum=char:FindFirstChildOfClass("Humanoid")
+if not hum then return end
+
+hum.WalkSpeed=speedOn and speedValue or 16
+hum.JumpPower=jumpOn and jumpValue or 50
+
+if noclip then
+for _,v in pairs(char:GetDescendants()) do
+if v:IsA("BasePart") then
+v.CanCollide=false
+end
+end
+end
+
+end)
+
+-- INF JUMP
+
+UIS.JumpRequest:Connect(function()
+
+if infJump and LP.Character then
+LP.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+end
+
+end)
