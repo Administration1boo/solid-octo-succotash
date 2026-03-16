@@ -267,7 +267,7 @@ end
 
 end)
 
--- SLIDERS (FIXED)
+-- SLIDERS
 
 local function slider(name,min,max,y)
 
@@ -301,13 +301,8 @@ local value=math.floor((max-min)*pos+min)
 
 label.Text=name..": "..value
 
-if name=="Speed" then
-speedValue=value
-end
-
-if name=="Jump" then
-jumpValue=value
-end
+if name=="Speed" then speedValue=value end
+if name=="Jump" then jumpValue=value end
 
 end
 
@@ -367,7 +362,7 @@ yt.Text="YT: UZTUBER"
 yt.TextScaled=true
 yt.TextColor3=Color3.fromRGB(220,0,255)
 
--- LOOP
+-- SPEED FIX
 
 RS.RenderStepped:Connect(function()
 
@@ -377,8 +372,18 @@ if not char then return end
 local hum=char:FindFirstChildOfClass("Humanoid")
 if not hum then return end
 
-hum.WalkSpeed=speedOn and speedValue or 16
-hum.JumpPower=jumpOn and jumpValue or 50
+if speedOn then
+hum.WalkSpeed=speedValue
+else
+hum.WalkSpeed=16
+end
+
+if jumpOn then
+hum.UseJumpPower=true
+hum.JumpPower=jumpValue
+else
+hum.JumpPower=50
+end
 
 if noclip then
 for _,v in pairs(char:GetDescendants()) do
@@ -386,6 +391,16 @@ if v:IsA("BasePart") then
 v.CanCollide=false
 end
 end
+end
+
+end)
+
+RS.Heartbeat:Connect(function()
+
+local hum=LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
+
+if hum and speedOn then
+hum.WalkSpeed=speedValue
 end
 
 end)
