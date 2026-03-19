@@ -1,0 +1,182 @@
+task.wait(0.1)
+
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+
+local Settings = {
+    Aimbot = false,
+    AutoShoot = false,
+    ESP = false,
+    RainbowESP = false
+}
+
+-- [ ГЛАВНЫЙ GUI ]
+local MainGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
+MainGui.Name = "AI_AIMBOT_FINAL_FIX"
+MainGui.IgnoreGuiInset = true -- Полный экран
+MainGui.DisplayOrder = 100
+
+-- [ ТОТ САМЫЙ РАБОЧИЙ ЧЕРНЫЙ ЭКРАН С ТЕКСТОМ ]
+local IntroFrame = Instance.new("Frame", MainGui)
+IntroFrame.Size = UDim2.new(1, 0, 1, 0)
+IntroFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+IntroFrame.BorderSizePixel = 0
+IntroFrame.ZIndex = 500
+
+local Disclaimer = Instance.new("TextLabel", IntroFrame)
+Disclaimer.Size = UDim2.new(0.9, 0, 0.8, 0)
+Disclaimer.Position = UDim2.new(0.05, 0, 0.1, 0)
+Disclaimer.BackgroundTransparency = 1
+Disclaimer.TextColor3 = Color3.fromRGB(255, 255, 255)
+Disclaimer.Font = Enum.Font.GothamBold
+Disclaimer.TextSize = 22
+Disclaimer.TextWrapped = true
+Disclaimer.ZIndex = 501
+Disclaimer.Text = "This script is made AI. \n\n If your account gets banned, we are not responsible for your account. It's up to you to decide whether to use scripts or not. \n\n Support Telegram: @UZTUBER_UZ"
+
+-- [ ФУНКЦИЯ СОЗДАНИЯ МЕНЮ ]
+local function CreateMenu()
+    local Main = Instance.new("Frame", MainGui)
+    Main.Size = UDim2.new(0, 220, 0, 280)
+    Main.Position = UDim2.new(0.5, -110, 0.2, 0)
+    Main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    Main.Active = true
+    Main.Draggable = true 
+    Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
+
+    local Title = Instance.new("TextLabel", Main)
+    Title.Size = UDim2.new(1, -40, 0, 45)
+    Title.Position = UDim2.new(0, 12, 0, 0)
+    Title.Text = "AI AIMBOT"
+    Title.Font = Enum.Font.GothamBold
+    Title.TextSize = 18
+    Title.BackgroundTransparency = 1
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+
+    local TgLabel = Instance.new("TextLabel", Main)
+    TgLabel.Size = UDim2.new(1, 0, 0, 20)
+    TgLabel.Position = UDim2.new(0, 0, 1, -20)
+    TgLabel.Text = "TG: @UZTUBER_UZ"
+    TgLabel.Font = Enum.Font.GothamSemibold
+    TgLabel.TextSize = 10
+    TgLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+    TgLabel.BackgroundTransparency = 1
+
+    local MinBtn = Instance.new("TextButton", Main)
+    MinBtn.Size = UDim2.new(0, 30, 0, 30)
+    MinBtn.Position = UDim2.new(1, -35, 0, 7)
+    MinBtn.Text = "-"
+    MinBtn.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
+    MinBtn.TextColor3 = Color3.new(1, 1, 1)
+    Instance.new("UICorner", MinBtn)
+
+    local Scroll = Instance.new("ScrollingFrame", Main)
+    Scroll.Size = UDim2.new(1, 0, 1, -75)
+    Scroll.Position = UDim2.new(0, 0, 0, 50)
+    Scroll.BackgroundTransparency = 1
+    Scroll.CanvasSize = UDim2.new(0, 0, 1.2, 0)
+    Scroll.ScrollBarThickness = 0
+
+    local Layout = Instance.new("UIListLayout", Scroll)
+    Layout.Padding = UDim.new(0, 8)
+    Layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+    local rainbows = {Title}
+
+    local function AddToggle(name, var)
+        local btn = Instance.new("TextButton", Scroll)
+        btn.Size = UDim2.new(0.9, 0, 0, 40)
+        btn.Text = name .. ": OFF"
+        btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        btn.TextColor3 = Color3.new(1, 1, 1)
+        btn.Font = Enum.Font.GothamSemibold
+        Instance.new("UICorner", btn)
+        table.insert(rainbows, btn)
+
+        btn.MouseButton1Click:Connect(function()
+            Settings[var] = not Settings[var]
+            btn.Text = name .. (Settings[var] and ": ON" or ": OFF")
+            btn.BackgroundColor3 = Settings[var] and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(30, 30, 30)
+            
+            if var == "ESP" and not Settings.ESP then
+                for _, p in pairs(Players:GetPlayers()) do
+                    if p.Character and p.Character:FindFirstChild("Highlight_ESP") then
+                        p.Character.Highlight_ESP:Destroy()
+                    end
+                end
+            end
+        end)
+    end
+
+    AddToggle("Hard Aimbot", "Aimbot")
+    AddToggle("Auto Shoot", "AutoShoot")
+    AddToggle("Full ESP", "ESP")
+    AddToggle("Rainbow ESP", "RainbowESP")
+
+    MinBtn.MouseButton1Click:Connect(function()
+        Scroll.Visible = not Scroll.Visible
+        Main:TweenSize(Scroll.Visible and UDim2.new(0, 220, 0, 280) or UDim2.new(0, 220, 0, 45), "Out", "Quart", 0.3, true)
+        MinBtn.Text = Scroll.Visible and "-" or "+"
+    end)
+
+    -- [ ЦИКЛ РАБОТЫ ]
+    RunService.RenderStepped:Connect(function()
+        local hue = tick() % 3 / 3
+        local clr = Color3.fromHSV(hue, 1, 1)
+        for _, el in pairs(rainbows) do el.TextColor3 = clr end
+
+        if Settings.Aimbot then
+            local target = nil
+            local dist = math.huge
+            for _, v in pairs(Players:GetPlayers()) do
+                if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("Head") and v.Character.Humanoid.Health > 0 then
+                    local pos, onScreen = Camera:WorldToViewportPoint(v.Character.Head.Position)
+                    if onScreen then
+                        local mag = (Vector2.new(pos.X, pos.Y) - Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)).Magnitude
+                        if mag < dist then
+                            target = v
+                            dist = mag
+                        end
+                    end
+                end
+            end
+
+            if target then
+                Camera.CFrame = CFrame.new(Camera.CFrame.Position, target.Character.Head.Position)
+                if Settings.AutoShoot then
+                    local tool = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Tool")
+                    if tool then tool:Activate() end
+                end
+            end
+        end
+
+        if Settings.ESP then
+            for _, p in pairs(Players:GetPlayers()) do
+                if p ~= LocalPlayer and p.Character then
+                    local h = p.Character:FindFirstChild("Highlight_ESP")
+                    if not h then
+                        h = Instance.new("Highlight", p.Character)
+                        h.Name = "Highlight_ESP"
+                    end
+                    h.FillColor = Settings.RainbowESP and clr or Color3.new(1, 0, 0)
+                end
+            end
+        end
+    end)
+end
+
+-- [ ЛОГИКА ОЧЕРЕДНОСТИ ]
+task.delay(5, function()
+    local t1 = TweenService:Create(Disclaimer, TweenInfo.new(1), {TextTransparency = 1})
+    local t2 = TweenService:Create(IntroFrame, TweenInfo.new(1.5), {BackgroundTransparency = 1})
+    t1:Play()
+    t2:Play()
+    t2.Completed:Connect(function() 
+        IntroFrame:Destroy() 
+        CreateMenu() -- Меню создается только ПОСЛЕ интро
+    end)
+end)
+
