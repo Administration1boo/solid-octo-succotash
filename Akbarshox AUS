@@ -1,0 +1,147 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+
+local Window = Rayfield:CreateWindow({
+   Name = "Akbarshox ESP",
+   LoadingTitle = "Made By: AUS",
+   LoadingSubtitle = "(Akbarshox United Script)",
+   ConfigurationSaving = {Enabled = false}
+})
+
+local ESPEnabled = false
+local RainbowEnabled = false
+local CurrentIndex = 1
+local RainbowSpeed = 0.7 
+
+local ColorSettings = {}
+for i = 1, 10 do
+    ColorSettings[i] = {
+        Color = Color3.fromRGB(255, 255, 255),
+        Enabled = (i <= 2)
+    }
+end
+
+-- Color parser for HEX and RGB
+local function parseColor(text)
+    if text:find("#") then
+        local success, result = pcall(function() return Color3.fromHex(text) end)
+        return success and result or nil
+    elseif text:find(",") then
+        local r, g, b = text:match("(%d+),%s*(%d+),%s*(%d+)")
+        if r and g and b then
+            return Color3.fromRGB(tonumber(r), tonumber(g), tonumber(b))
+        end
+    end
+    return nil
+end
+
+local function applyESP(character)
+    if not character or not ESPEnabled then return end
+    local h = character:FindFirstChild("ESPHighlight") or Instance.new("Highlight")
+    h.Name = "ESPHighlight"
+    h.Parent = character
+    h.FillTransparency = 0.5
+    h.OutlineTransparency = 0
+    return h
+end
+
+-- TABS
+local MainTab = Window:CreateTab("Main", 4483362458)
+local RainbowTab = Window:CreateTab("Palette", 4483362458)
+
+-- MAIN TAB
+MainTab:CreateToggle({
+   Name = "Enable ESP",
+   CurrentValue = false,
+   Callback = function(Value)
+       ESPEnabled = Value
+       if not Value then
+           for _, p in pairs(Players:GetPlayers()) do
+               local h = p.Character and p.Character:FindFirstChild("ESPHighlight")
+               if h then h:Destroy() end
+           end
+       end
+   end,
+})
+
+MainTab:CreateToggle({
+   Name = "Rainbow Mode",
+   CurrentValue = false,
+   Callback = function(Value) RainbowEnabled = Value end,
+})
+
+-- PALETTE TAB
+RainbowTab:CreateInput({
+   Name = "Cycle Speed (sec)",
+   PlaceholderText = "Example: 0.5",
+   Callback = function(Text) RainbowSpeed = tonumber(Text) or 0.7 end,
+})
+
+for i = 1, 10 do
+    RainbowTab:CreateSection("Color Settings #" .. i)
+    
+    local Picker = RainbowTab:CreateColorPicker({
+        Name = "Visual Selector",
+        Color = ColorSettings[i].Color,
+        Callback = function(Value)
+            ColorSettings[i].Color = Value
+        end
+    })
+
+    RainbowTab:CreateInput({
+        Name = "Keyboard Input",
+        PlaceholderText = "#HEX or R,G,B",
+        Callback = function(Text)
+            local newColor = parseColor(Text)
+            if newColor then
+                ColorSettings[i].Color = newColor
+                Picker:Set(newColor)
+                Rayfield:Notify({Title = "Success", Content = "Color #"..i.." updated!", Duration = 1.5})
+            end
+        end,
+    })
+
+    RainbowTab:CreateToggle({
+        Name = "Include in Cycle",
+        CurrentValue = ColorSettings[i].Enabled,
+        Callback = function(Value) ColorSettings[i].Enabled = Value end
+    })
+end
+
+-- RENDER LOOP
+task.spawn(function()
+    while true do
+        if ESPEnabled then
+            local activeColors = {}
+            for i = 1, 10 do
+                if ColorSettings[i].Enabled then table.insert(activeColors, ColorSettings[i].Color) end
+            end
+
+            if #activeColors > 0 then
+                if CurrentIndex > #activeColors then CurrentIndex = 1 end
+                local TargetColor = RainbowEnabled and activeColors[CurrentIndex] or activeColors[1]
+                if RainbowEnabled then CurrentIndex = CurrentIndex + 1 end
+
+                for _, player in pairs(Players:GetPlayers()) do
+                    if player ~= Players.LocalPlayer and player.Character then
+                        local h = applyESP(player.Character)
+                        if h then
+                            TweenService:Create(h, TweenInfo.new(RainbowSpeed), {FillColor = TargetColor}):Play()
+                        end
+                    end
+                end
+            end
+        end
+        task.wait(RainbowSpeed)
+    end
+end)
+
+-- PLAYER HANDLER
+Players.PlayerAdded:Connect(function(p)
+    p.CharacterAdded:Connect(function(char)
+        task.wait(1)
+        if ESPEnabled then applyESP(char) end
+    end)
+end)
+
