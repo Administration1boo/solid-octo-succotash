@@ -1,5 +1,4 @@
--- [[ AKBARSHOX UI v10.0 - OFFICIAL PREMIUM LIBRARY ]] --
--- Global Edition: English Language
+-- [[ AKBARSHOX UI v11.0 - OFFICIAL GLOBAL LIBRARY ]] --
 
 local Library = {}
 local ts = game:GetService("TweenService")
@@ -10,23 +9,23 @@ function Library:CreateWindow(name, animSpeed)
     ScreenGui.Name = "AkbarshoxUI_Premium"
     ScreenGui.ResetOnSpawn = false
     
-    -- Animation Configuration (Quart Out for premium feel)
+    -- Animation Config (Quart Easing for "Expensive" feel)
     local speed = animSpeed or 0.8
     local info = TweenInfo.new(speed, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
     
-    -- Main Frame
+    -- Main Window Frame
     local Main = Instance.new("Frame", ScreenGui)
     Main.Name = "Main"
-    Main.BackgroundColor3 = Color3.new(1, 1, 1) -- Required for UIGradient
-    Main.Position = UDim2.new(0.5, -125, 0.5, -125)
-    Main.Size = UDim2.new(0, 0, 0, 0) -- Starting size for entrance animation
+    Main.BackgroundColor3 = Color3.new(1, 1, 1) -- Necessary for Gradient
+    Main.Position = UDim2.new(0.5, -130, 0.5, -130)
+    Main.Size = UDim2.new(0, 0, 0, 0) -- Starts at 0 for entrance animation
     Main.ClipsDescendants = true
     Main.Active = true
     Main.Draggable = true
     Main.BackgroundTransparency = 1
     Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 15)
     
-    -- Premium Animated Gradient
+    -- Signature Animated Gradient
     local UIGrad = Instance.new("UIGradient", Main)
     UIGrad.Color = ColorSequence.new({
         ColorSequenceKeypoint.new(0, Color3.fromRGB(10, 10, 10)),
@@ -51,7 +50,7 @@ function Library:CreateWindow(name, animSpeed)
         BackgroundTransparency = 0
     }):Play()
 
-    -- Top Bar Header
+    -- Header (Top Bar)
     local TopBar = Instance.new("Frame", Main)
     TopBar.Size = UDim2.new(1, 0, 0, 45)
     TopBar.BackgroundTransparency = 1
@@ -66,7 +65,7 @@ function Library:CreateWindow(name, animSpeed)
     Title.TextSize = 15
     Title.TextXAlignment = Enum.TextXAlignment.Left
 
-    -- Container for UI Elements
+    -- Elements Container
     local Content = Instance.new("Frame", Main)
     Content.Name = "Content"
     Content.Size = UDim2.new(1, 0, 1, -45)
@@ -77,7 +76,7 @@ function Library:CreateWindow(name, animSpeed)
     layout.Padding = UDim.new(0, 8)
     Instance.new("UIPadding", Content).PaddingTop = UDim.new(0, 10)
 
-    -- Header Control Buttons (Clean Style)
+    -- Header Control Buttons
     local function CreateHeadBtn(text, pos, color, callback)
         local btn = Instance.new("TextButton", TopBar)
         btn.Size = UDim2.new(0, 35, 0, 35)
@@ -90,7 +89,7 @@ function Library:CreateWindow(name, animSpeed)
         btn.MouseButton1Click:Connect(callback)
     end
 
-    -- [[ EXIT ANIMATION ]] --
+    -- Close (X) with Exit Animation
     CreateHeadBtn("×", UDim2.new(0.84, 0, 0, 5), Color3.fromRGB(255, 60, 60), function() 
         running = false
         local death = ts:Create(Main, info, {
@@ -101,7 +100,7 @@ function Library:CreateWindow(name, animSpeed)
         death.Completed:Connect(function() ScreenGui:Destroy() end)
     end)
     
-    -- [[ SMOOTH MINIMIZE ]] --
+    -- Minimize (-)
     CreateHeadBtn("-", UDim2.new(0.70, 0, 0, 5), Color3.new(1, 1, 1), function()
         local isMin = Main.Size.Y.Offset < 100
         ts:Create(Main, info, {
@@ -110,25 +109,62 @@ function Library:CreateWindow(name, animSpeed)
         Content.Visible = isMin
     end)
 
-    -- Function to add a simple status label
+    -- [[ UI ELEMENT FUNCTIONS ]] --
     local WindowFunctions = {}
+
+    -- Function: Add a Label
     function WindowFunctions:AddLabel(text)
         local lab = Instance.new("TextLabel", Content)
         lab.Size = UDim2.new(0.9, 0, 0, 20)
         lab.BackgroundTransparency = 1
         lab.Text = text
-        lab.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+        lab.TextColor3 = Color3.fromRGB(200, 200, 200)
         lab.Font = Enum.Font.Gotham
         lab.TextSize = 12
         return lab
     end
 
+    -- Function: Create a Button
+    function WindowFunctions:CreateButton(text, callback)
+        local btn = Instance.new("TextButton", Content)
+        btn.Size = UDim2.new(0.9, 0, 0, 38)
+        btn.BackgroundColor3 = Color3.fromRGB(30, 10, 10)
+        btn.Text = text
+        btn.TextColor3 = Color3.new(1, 1, 1)
+        btn.Font = Enum.Font.GothamMedium
+        btn.TextSize = 14
+        btn.AutoButtonColor = false
+        Instance.new("UICorner", btn)
+        
+        btn.MouseButton1Click:Connect(function()
+            ts:Create(btn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(70, 20, 20)}):Play()
+            task.wait(0.1)
+            ts:Create(btn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(30, 10, 10)}):Play()
+            callback()
+        end)
+    end
+
+    -- Function: Create a TextBox (Input)
+    function WindowFunctions:CreateTextBox(placeholder, callback)
+        local box = Instance.new("TextBox", Content)
+        box.Size = UDim2.new(0.9, 0, 0, 38)
+        box.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+        box.PlaceholderText = placeholder
+        box.Text = ""
+        box.TextColor3 = Color3.new(1, 1, 1)
+        box.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
+        box.Font = Enum.Font.Gotham
+        box.TextSize = 13
+        Instance.new("UICorner", box)
+        
+        box.FocusLost:Connect(function(enterPressed)
+            if enterPressed then
+                callback(box.Text)
+            end
+        end)
+    end
+
     return WindowFunctions
 end
-
--- INITIALIZATION EXAMPLE (You can keep or remove this part)
-local MyUI = Library:CreateWindow("AKBARSHOX UI", 0.8)
-MyUI:AddLabel("Status: Operational")
-MyUI:AddLabel("Version: 10.0 (Global)")
 
 return Library
