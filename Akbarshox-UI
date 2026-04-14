@@ -1,4 +1,5 @@
--- [[ AKBARSHOX UI v10.0 - ULTIMATE EDITION ]] --
+-- [[ AKBARSHOX UI v10.0 - OFFICIAL PREMIUM LIBRARY ]] --
+-- Global Edition: English Language
 
 local Library = {}
 local ts = game:GetService("TweenService")
@@ -9,23 +10,23 @@ function Library:CreateWindow(name, animSpeed)
     ScreenGui.Name = "AkbarshoxUI_Premium"
     ScreenGui.ResetOnSpawn = false
     
-    -- Настройка плавности (0.8 — золотой стандарт для "дорогого" софта)
+    -- Animation Configuration (Quart Out for premium feel)
     local speed = animSpeed or 0.8
     local info = TweenInfo.new(speed, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
     
-    -- ГЛАВНОЕ ОКНО
+    -- Main Frame
     local Main = Instance.new("Frame", ScreenGui)
     Main.Name = "Main"
-    Main.BackgroundColor3 = Color3.new(1, 1, 1)
+    Main.BackgroundColor3 = Color3.new(1, 1, 1) -- Required for UIGradient
     Main.Position = UDim2.new(0.5, -125, 0.5, -125)
-    Main.Size = UDim2.new(0, 0, 0, 0) -- Для анимации появления
+    Main.Size = UDim2.new(0, 0, 0, 0) -- Starting size for entrance animation
     Main.ClipsDescendants = true
     Main.Active = true
     Main.Draggable = true
     Main.BackgroundTransparency = 1
     Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 15)
     
-    -- ТОТ САМЫЙ КРОВАВЫЙ ГРАДИЕНТ
+    -- Premium Animated Gradient
     local UIGrad = Instance.new("UIGradient", Main)
     UIGrad.Color = ColorSequence.new({
         ColorSequenceKeypoint.new(0, Color3.fromRGB(10, 10, 10)),
@@ -44,13 +45,13 @@ function Library:CreateWindow(name, animSpeed)
         end
     end)
 
-    -- [ ЭФФЕКТ ПОЯВЛЕНИЯ ] --
+    -- [[ ENTRANCE ANIMATION ]] --
     ts:Create(Main, info, {
         Size = UDim2.new(0, 260, 0, 260),
         BackgroundTransparency = 0
     }):Play()
 
-    -- ШАПКА
+    -- Top Bar Header
     local TopBar = Instance.new("Frame", Main)
     TopBar.Size = UDim2.new(1, 0, 0, 45)
     TopBar.BackgroundTransparency = 1
@@ -65,14 +66,18 @@ function Library:CreateWindow(name, animSpeed)
     Title.TextSize = 15
     Title.TextXAlignment = Enum.TextXAlignment.Left
 
-    -- ПУСТОЙ КОНТЕНТ (ДЛЯ БУДУЩИХ ФУНКЦИЙ)
+    -- Container for UI Elements
     local Content = Instance.new("Frame", Main)
     Content.Name = "Content"
     Content.Size = UDim2.new(1, 0, 1, -45)
     Content.Position = UDim2.new(0, 0, 0, 45)
     Content.BackgroundTransparency = 1
+    local layout = Instance.new("UIListLayout", Content)
+    layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    layout.Padding = UDim.new(0, 8)
+    Instance.new("UIPadding", Content).PaddingTop = UDim.new(0, 10)
 
-    -- КНОПКИ УПРАВЛЕНИЯ (БЕЗ ФОНА)
+    -- Header Control Buttons (Clean Style)
     local function CreateHeadBtn(text, pos, color, callback)
         local btn = Instance.new("TextButton", TopBar)
         btn.Size = UDim2.new(0, 35, 0, 35)
@@ -85,7 +90,7 @@ function Library:CreateWindow(name, animSpeed)
         btn.MouseButton1Click:Connect(callback)
     end
 
-    -- [ ЭФФЕКТ УМИРАНИЯ ] --
+    -- [[ EXIT ANIMATION ]] --
     CreateHeadBtn("×", UDim2.new(0.84, 0, 0, 5), Color3.fromRGB(255, 60, 60), function() 
         running = false
         local death = ts:Create(Main, info, {
@@ -96,7 +101,7 @@ function Library:CreateWindow(name, animSpeed)
         death.Completed:Connect(function() ScreenGui:Destroy() end)
     end)
     
-    -- [ ПЛАВНОЕ СВОРАЧИВАНИЕ ] --
+    -- [[ SMOOTH MINIMIZE ]] --
     CreateHeadBtn("-", UDim2.new(0.70, 0, 0, 5), Color3.new(1, 1, 1), function()
         local isMin = Main.Size.Y.Offset < 100
         ts:Create(Main, info, {
@@ -105,8 +110,25 @@ function Library:CreateWindow(name, animSpeed)
         Content.Visible = isMin
     end)
 
-    return {} 
+    -- Function to add a simple status label
+    local WindowFunctions = {}
+    function WindowFunctions:AddLabel(text)
+        local lab = Instance.new("TextLabel", Content)
+        lab.Size = UDim2.new(0.9, 0, 0, 20)
+        lab.BackgroundTransparency = 1
+        lab.Text = text
+        lab.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+        lab.Font = Enum.Font.Gotham
+        lab.TextSize = 12
+        return lab
+    end
+
+    return WindowFunctions
 end
 
--- ЗАПУСК (0.8 сек - самая дорогая анимация)
-Library:CreateWindow("AKBARSHOX UI", 0.8)
+-- INITIALIZATION EXAMPLE (You can keep or remove this part)
+local MyUI = Library:CreateWindow("AKBARSHOX UI", 0.8)
+MyUI:AddLabel("Status: Operational")
+MyUI:AddLabel("Version: 10.0 (Global)")
+
+return Library
